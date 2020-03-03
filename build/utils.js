@@ -13,6 +13,7 @@ exports.compact = compact;
 exports.compactItem = compactItem;
 exports.correctBounds = correctBounds;
 exports.getLayoutItem = getLayoutItem;
+exports.getLayoutItemIndex = getLayoutItemIndex;
 exports.getFirstCollision = getFirstCollision;
 exports.getAllCollisions = getAllCollisions;
 exports.getStatics = getStatics;
@@ -422,6 +423,27 @@ function getLayoutItem(
   for (var i = 0, len = layout.length; i < len; i++) {
     if (layout[i].i === id) return layout[i];
   }
+}
+/**
+ * Get a layout item index by ID.
+ *
+ * @param  {Array}  layout Layout array.
+ * @param  {String} id     ID
+ * @return {number}    Item index at ID.
+ */
+
+function getLayoutItemIndex(
+  layout,
+  /*: Layout*/
+  id
+  /*: string*/
+) {
+  /*: number*/
+  for (var i = 0, len = layout.length; i < len; i++) {
+    if (layout[i].i === id) return i;
+  }
+
+  return -1;
 }
 /**
  * Returns the first item this layout collides with.

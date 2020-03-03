@@ -235,6 +235,7 @@ var ReactGridLayout =
         oldDragItem: null,
         oldLayout: null,
         oldResizeItem: null,
+        activeResizeItem: null,
         droppingDOMNode: null,
         children: []
       });
@@ -680,10 +681,11 @@ var ReactGridLayout =
             var _this$props4 = this.props,
               cols = _this$props4.cols,
               preventCollision = _this$props4.preventCollision;
-            var l =
+            var layoutItem =
               /*: ?LayoutItem*/
               (0, _utils.getLayoutItem)(layout, i);
-            if (!l) return; // Something like quad tree should be used
+            if (!layoutItem) return;
+            var l = (0, _utils.cloneLayoutItem)(layoutItem); // Something like quad tree should be used
             // to find collisions faster
 
             var hasCollisions;
@@ -737,6 +739,8 @@ var ReactGridLayout =
                 (0, _utils.compactType)(this.props),
                 cols
               ),
+              // The item was cloned to prevent prop mutation. The layout will be updated in onResizeStop.
+              activeResizeItem: l,
               activeDrag: placeholder
             });
           }
@@ -756,6 +760,7 @@ var ReactGridLayout =
               node = _ref7.node;
             var _this$state2 = this.state,
               layout = _this$state2.layout,
+              activeResizeItem = _this$state2.activeResizeItem,
               oldResizeItem = _this$state2.oldResizeItem;
             var cols = this.props.cols;
             var l = (0, _utils.getLayoutItem)(layout, i);
@@ -766,6 +771,19 @@ var ReactGridLayout =
               (0, _utils.compactType)(this.props),
               cols
             );
+
+            if (activeResizeItem) {
+              var activeResizeItemIndex = (0, _utils.getLayoutItemIndex)(
+                newLayout,
+                activeResizeItem.i
+              );
+
+              if (activeResizeItemIndex >= 0) {
+                // Update the active item
+                newLayout[activeResizeItemIndex] = activeResizeItem;
+              }
+            }
+
             var oldLayout = this.state.oldLayout;
             this.setState({
               activeDrag: null,
@@ -782,7 +800,8 @@ var ReactGridLayout =
         },
         {
           key: "placeholder",
-          value: function placeholder /*: ?ReactElement<any>*/() {
+          value: function placeholder() /*: ?ReactElement<any>*/
+          {
             var activeDrag = this.state.activeDrag;
             if (!activeDrag) return null;
             var _this$props5 = this.props,
@@ -829,9 +848,10 @@ var ReactGridLayout =
           value: function processGridItem(
             child,
             /*: ReactElement<any>*/
-            isDroppingItem /*: ?ReactElement<any>*/
+            isDroppingItem
             /*: boolean*/
-          ) {
+          ) /*: ?ReactElement<any>*/
+          {
             if (!child || !child.key) return;
             var l = (0, _utils.getLayoutItem)(
               this.state.layout,
